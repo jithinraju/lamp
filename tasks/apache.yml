@@ -1,0 +1,34 @@
+---
+- name: 'installing httpd'
+  yum:
+   name:
+     - httpd
+     - php
+     - php-mysql
+  state: present
+
+- name: 'adding conf file'
+  template:
+       src: virtualhost.j2
+       dest: /etc/httpd/conf.d/{{domain}}
+
+- name: 'adding document root'
+  file:
+   path: /var/www/html/{{domain}}
+   state: directory
+   owner: apache
+   group: apache
+   mode: 0755
+
+- name: 'info.html'
+  copy:
+    src: info.html
+    dest: /var/www/html/{{domain}}/info.html
+
+- name: 'info.php'
+  copy: 
+    src: info.php
+    dest: /var/www/html/{{domain}}/info.php
+
+- name: 'restart'
+  service: name=httpd state=restarted enabled=yes 
